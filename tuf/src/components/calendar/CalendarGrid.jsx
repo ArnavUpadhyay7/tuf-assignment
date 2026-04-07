@@ -3,6 +3,48 @@ import { motion, AnimatePresence } from 'framer-motion'
 import DayCell from './DayCell'
 import { DAYS_OF_WEEK } from '../utils/dateUtils'
 
+// ── Sub-components ─────────────────────────────────────────────────────────────
+
+function NavButton({ onClick, children, pill = false, 'aria-label': ariaLabel }) {
+  if (pill) {
+    return (
+      <button
+        onClick={onClick}
+        className="px-3 py-1 text-[11px] font-semibold tracking-wide rounded-full text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors duration-150"
+      >
+        {children}
+      </button>
+    )
+  }
+  return (
+    <button
+      onClick={onClick}
+      aria-label={ariaLabel}
+      className="w-8 h-8 flex items-center justify-center rounded-full text-stone-400 hover:bg-black/6 hover:text-stone-700 transition-all duration-150"
+    >
+      {children}
+    </button>
+  )
+}
+
+function ChevronLeft() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+      <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function ChevronRight() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+      <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+// ── CalendarGrid ──────────────────────────────────────────────────────────────
+
 export default function CalendarGrid({
   currentYear,
   currentMonth,
@@ -18,67 +60,36 @@ export default function CalendarGrid({
   const monthKey = `${currentYear}-${currentMonth}`
 
   return (
-    <div className="flex flex-col gap-5" style={{ paddingTop: '36px' }}>
+    <div className="flex flex-col gap-5 pt-9">
 
-      {/* ── Nav row ── */}
+      {/* Navigation row */}
       <div className="flex items-center justify-end gap-1">
-        <button
-          onClick={goToToday}
-          className="px-3 py-1 text-xs font-semibold rounded-full transition-all duration-150"
-          style={{
-            color: '#2563eb',
-            background: 'rgba(37,99,235,0.08)',
-            letterSpacing: '0.02em',
-          }}
-          onMouseEnter={e => e.currentTarget.style.background = 'rgba(37,99,235,0.15)'}
-          onMouseLeave={e => e.currentTarget.style.background = 'rgba(37,99,235,0.08)'}
-        >
-          Today
-        </button>
-        <button
-          onClick={goToPrevMonth}
-          className="w-8 h-8 flex items-center justify-center rounded-full transition-all duration-150"
-          style={{ color: '#9a9390' }}
-          aria-label="Previous month"
-          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,0,0,0.06)'; e.currentTarget.style.color = '#3d3733' }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#9a9390' }}
-        >
-          <ChevronLeftIcon />
-        </button>
-        <button
-          onClick={goToNextMonth}
-          className="w-8 h-8 flex items-center justify-center rounded-full transition-all duration-150"
-          style={{ color: '#9a9390' }}
-          aria-label="Next month"
-          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,0,0,0.06)'; e.currentTarget.style.color = '#3d3733' }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#9a9390' }}
-        >
-          <ChevronRightIcon />
-        </button>
+        <NavButton onClick={goToToday} pill>Today</NavButton>
+        <NavButton onClick={goToPrevMonth} aria-label="Previous month"><ChevronLeft /></NavButton>
+        <NavButton onClick={goToNextMonth} aria-label="Next month"><ChevronRight /></NavButton>
       </div>
 
-      {/* ── Day headers ── */}
+      {/* Day-of-week headers */}
       <div className="grid grid-cols-7">
         {DAYS_OF_WEEK.map((day) => (
           <div
             key={day}
-            className="flex items-center justify-center h-7 font-semibold uppercase tracking-widest"
-            style={{ color: '#c4bdb7', fontSize: '0.62rem' }}
+            className="flex items-center justify-center h-7 text-[10px] font-semibold uppercase tracking-widest text-stone-300"
           >
             {day}
           </div>
         ))}
       </div>
 
-      {/* ── Animated day grid ── */}
+      {/* Animated day grid */}
       <AnimatePresence mode="wait">
         <motion.div
           key={monthKey}
-          initial={{ opacity: 0, x: 32 }}
+          initial={{ opacity: 0, x: 24 }}
           animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -32 }}
-          transition={{ duration: 0.22, ease: [0.25, 0.1, 0.25, 1] }}
-          className="grid grid-cols-7 gap-y-0.5"
+          exit={{ opacity: 0, x: -24 }}
+          transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+          className="grid grid-cols-7"
         >
           {calendarGrid.map(({ date, isCurrentMonth }) => {
             const state = getDayState(date)
@@ -104,21 +115,5 @@ export default function CalendarGrid({
         </motion.div>
       </AnimatePresence>
     </div>
-  )
-}
-
-function ChevronLeftIcon() {
-  return (
-    <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
-      <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
-
-function ChevronRightIcon() {
-  return (
-    <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
-      <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
   )
 }

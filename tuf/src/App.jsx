@@ -4,39 +4,59 @@ import CalendarGrid from './components/calendar/CalendarGrid'
 import NotesPanel from './components/notes/NotesPanel'
 import HeroImage from './components/layout/HeroImage'
 
+// ── Sub-components ─────────────────────────────────────────────────────────────
+
+function SelectionHint({ hasSelection, hasRange, startDate, endDate }) {
+  if (!hasSelection) {
+    return (
+      <p className="mt-5 text-xs text-center text-stone-300">
+        Click a day to start selecting a range
+      </p>
+    )
+  }
+
+  if (!hasRange) {
+    return (
+      <p className="mt-5 text-xs text-center text-blue-300 animate-pulse">
+        Click another day to complete the range
+      </p>
+    )
+  }
+
+  const fmt = (d) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+
+  return (
+    <p className="mt-5 text-xs text-center text-stone-400">
+      {fmt(startDate)} → {fmt(endDate)}
+      <span className="text-stone-300"> · Click any day to reset</span>
+    </p>
+  )
+}
+
+// ── App ────────────────────────────────────────────────────────────────────────
+
 export default function App() {
   const calendar = useCalendar()
   const range = useRangeSelection()
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center p-4 md:p-8"
-      style={{ background: 'linear-gradient(135deg, #e8e4dc 0%, #d6d0c8 100%)' }}
-    >
-      {/* ── Main Card ── */}
-      <div
-        className="w-full max-w-3xl rounded-[2rem] overflow-hidden"
-        style={{
-          background: '#faf9f7',
-          boxShadow:
-            '0 4px 6px -1px rgba(0,0,0,0.04), 0 20px 60px -10px rgba(0,0,0,0.18), 0 0 0 1px rgba(255,255,255,0.8) inset',
-        }}
-      >
-        {/* ── Top: Hero Image ── */}
+    <div className="min-h-screen flex items-center justify-center p-4 md:p-8 bg-gradient-to-br from-stone-200 to-stone-300">
+
+      {/* Main card */}
+      <div className="w-full max-w-3xl rounded-[28px] overflow-hidden bg-[#faf9f7] shadow-2xl shadow-black/20 ring-1 ring-white/70">
+
+        {/* Hero image with month badge */}
         <HeroImage
           currentMonth={calendar.currentMonth}
           currentYear={calendar.currentYear}
           monthName={calendar.monthName}
         />
 
-        {/* ── Bottom: Notes | Calendar ── */}
+        {/* Body: Notes | Calendar */}
         <div className="flex flex-col md:flex-row">
 
           {/* Notes — left column */}
-          <div
-            className="md:w-56 lg:w-64 flex-shrink-0 p-7 md:border-r"
-            style={{ borderColor: 'rgba(0,0,0,0.06)' }}
-          >
+          <div className="md:w-56 lg:w-64 shrink-0 px-7 pb-7 pt-12 border-b md:border-b-0 md:border-r border-black/[0.06]">
             <NotesPanel
               currentYear={calendar.currentYear}
               currentMonth={calendar.currentMonth}
@@ -48,7 +68,7 @@ export default function App() {
           </div>
 
           {/* Calendar — right column */}
-          <div className="flex-1 p-6 md:p-7 flex flex-col">
+          <div className="flex-1 flex flex-col px-6 md:px-7 pb-7">
             <CalendarGrid
               currentYear={calendar.currentYear}
               currentMonth={calendar.currentMonth}
@@ -69,33 +89,9 @@ export default function App() {
               endDate={range.endDate}
             />
           </div>
+
         </div>
       </div>
     </div>
-  )
-}
-
-function SelectionHint({ hasSelection, hasRange, startDate, endDate }) {
-  if (!hasSelection) {
-    return (
-      <p className="mt-5 text-xs text-center" style={{ color: '#b8b0a4' }}>
-        Click a day to start selecting a range
-      </p>
-    )
-  }
-  if (hasSelection && !hasRange) {
-    return (
-      <p className="mt-5 text-xs text-center animate-pulse" style={{ color: '#7c9fc9' }}>
-        Click another day to complete the range
-      </p>
-    )
-  }
-  return (
-    <p className="mt-5 text-xs text-center" style={{ color: '#9a9390' }}>
-      {startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-      {' → '}
-      {endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-      {' · Click any day to reset'}
-    </p>
   )
 }

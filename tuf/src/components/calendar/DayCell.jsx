@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { isToday } from '../utils/dateUtils'
 
 export default function DayCell({
@@ -16,120 +16,68 @@ export default function DayCell({
   onMouseEnter,
   onMouseLeave,
 }) {
+  const [hovered, setHovered] = useState(false)
   const today = isToday(date)
   const dayNumber = date.getDate()
   const isEndpoint = isStart || isEnd
   const isPreviewEndpoint = (isPreviewStart || isPreviewEnd) && !isEndpoint
 
-  // ── Container: range strip ──────────────────────────────────────────────────
-  const containerStyle = {
-    position: 'relative',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '36px',
-    cursor: isCurrentMonth ? 'pointer' : 'default',
-    userSelect: 'none',
-    transition: 'background-color 100ms ease',
-  }
+  // ── Strip (range fill band) ──────────────────────────────────────────────
+  const stripBase = 'relative flex items-center justify-center h-9 select-none transition-colors duration-100'
 
-  if (inRange) {
-    containerStyle.background = 'rgba(37, 99, 235, 0.07)'
-    if (isRangeStart) containerStyle.borderRadius = '50% 0 0 50%'
-    else if (isRangeEnd) containerStyle.borderRadius = '0 50% 50% 0'
-  } else if (isInPreviewRange) {
-    containerStyle.background = 'rgba(37, 99, 235, 0.05)'
-    if (isPreviewStart) containerStyle.borderRadius = '50% 0 0 50%'
-    else if (isPreviewEnd) containerStyle.borderRadius = '0 50% 50% 0'
-  }
+  const stripRange = (() => {
+    if (inRange) {
+      if (isRangeStart) return 'bg-blue-50 rounded-l-full'
+      if (isRangeEnd)   return 'bg-blue-50 rounded-r-full'
+      return 'bg-blue-50'
+    }
+    if (isInPreviewRange) {
+      if (isPreviewStart) return 'bg-blue-50/60 rounded-l-full'
+      if (isPreviewEnd)   return 'bg-blue-50/60 rounded-r-full'
+      return 'bg-blue-50/60'
+    }
+    return ''
+  })()
 
-  // ── Inner circle ────────────────────────────────────────────────────────────
-  const circleStyle = {
-    position: 'relative',
-    zIndex: 10,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '34px',
-    width: '34px',
-    borderRadius: '50%',
-    fontSize: '0.8125rem',
-    fontWeight: '400',
-    transition: 'all 140ms cubic-bezier(0.34, 1.56, 0.64, 1)',
-    color: '#5c5450',
-  }
+  const stripCursor = isCurrentMonth ? 'cursor-pointer' : 'cursor-default'
 
-  if (isEndpoint) {
-    circleStyle.background = 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)'
-    circleStyle.color = '#ffffff'
-    circleStyle.fontWeight = '600'
-    circleStyle.boxShadow = '0 4px 12px rgba(37, 99, 235, 0.4), 0 1px 3px rgba(0,0,0,0.1)'
-    circleStyle.transform = 'scale(1.05)'
-  } else if (isPreviewEndpoint) {
-    circleStyle.background = 'rgba(37, 99, 235, 0.18)'
-    circleStyle.color = '#2563eb'
-    circleStyle.fontWeight = '500'
-  } else if (today) {
-    circleStyle.color = '#2563eb'
-    circleStyle.fontWeight = '700'
-  } else if (!isCurrentMonth) {
-    circleStyle.color = '#d4cdc8'
-    circleStyle.fontWeight = '300'
-  }
+  // ── Circle (day number bubble) ───────────────────────────────────────────
+  const circleBase = 'relative z-10 flex items-center justify-center w-[34px] h-[34px] rounded-full text-[13px] transition-all duration-150'
+
+  const circleVariant = (() => {
+    if (isEndpoint)      return 'bg-gradient-to-br from-blue-500 to-blue-700 text-white font-semibold shadow-lg shadow-blue-500/40 scale-105'
+    if (isPreviewEndpoint) return 'bg-blue-100 text-blue-600 font-medium'
+    if (today)           return 'text-blue-600 font-bold'
+    if (!isCurrentMonth) return 'text-stone-300 font-light'
+    if (hovered)         return 'bg-black/5 text-stone-700 scale-105'
+    return 'text-stone-600 font-normal'
+  })()
 
   return (
     <div
-      style={containerStyle}
+      className={`${stripBase} ${stripRange} ${stripCursor}`}
       onClick={() => isCurrentMonth && onClick(date)}
-      onMouseEnter={() => onMouseEnter?.(date)}
-      onMouseLeave={() => onMouseLeave?.()}
+      onMouseEnter={() => { setHovered(true); onMouseEnter?.(date) }}
+      onMouseLeave={() => { setHovered(false); onMouseLeave?.() }}
       role="button"
+      tabIndex={isCurrentMonth ? 0 : -1}
       aria-label={date.toLocaleDateString('en-US', {
         weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
       })}
       aria-pressed={isEndpoint}
-      tabIndex={isCurrentMonth ? 0 : -1}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault()
           isCurrentMonth && onClick(date)
         }
       }}
-      onMouseOver={(e) => {
-        if (!isEndpoint && isCurrentMonth) {
-          const circle = e.currentTarget.querySelector('[data-circle]')
-          if (circle && !isPreviewEndpoint) {
-            circle.style.background = 'rgba(0,0,0,0.045)'
-          }
-        }
-      }}
-      onMouseOut={(e) => {
-        if (!isEndpoint && isCurrentMonth) {
-          const circle = e.currentTarget.querySelector('[data-circle]')
-          if (circle && !isPreviewEndpoint) {
-            circle.style.background = ''
-          }
-        }
-      }}
     >
-      {/* Today dot */}
+      {/* Today indicator dot */}
       {today && !isEndpoint && (
-        <span
-          style={{
-            position: 'absolute',
-            bottom: '3px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: '3px',
-            height: '3px',
-            borderRadius: '50%',
-            background: '#2563eb',
-            zIndex: 11,
-          }}
-        />
+        <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-blue-500 z-20" />
       )}
 
-      <span data-circle style={circleStyle}>
+      <span className={`${circleBase} ${circleVariant}`}>
         {dayNumber}
       </span>
     </div>
