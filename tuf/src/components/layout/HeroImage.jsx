@@ -1,85 +1,94 @@
 import React from 'react'
 
-// Curated set of Unsplash landscape photos for each month
 const MONTH_IMAGES = [
-  { url: 'https://images.unsplash.com/photo-1516912481808-3406841bd33c?w=900&q=80', alt: 'Snowy winter landscape' },           // Jan
-  { url: 'https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=900&q=80', alt: 'Misty forest in early spring' },     // Feb
-  { url: 'https://images.unsplash.com/photo-1490750967868-88df5691cc1b?w=900&q=80', alt: 'Cherry blossoms in bloom' },         // Mar
-  { url: 'https://images.unsplash.com/photo-1462275646964-a0e3386b89fa?w=900&q=80', alt: 'Spring meadow flowers' },            // Apr
-  { url: 'https://images.unsplash.com/photo-1490750967868-88df5691cc1b?w=900&q=80', alt: 'Bright spring hillside' },           // May
-  { url: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=900&q=80', alt: 'Sunlit summer mountain' },           // Jun
-  { url: 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=900&q=80', alt: 'Warm beach sunset' },               // Jul
-  { url: 'https://images.unsplash.com/photo-1444464666168-49d633b86797?w=900&q=80', alt: 'Golden summer valley' },            // Aug
-  { url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=900&q=80', alt: 'Autumn forest foliage' },           // Sep
-  { url: 'https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=900&q=80', alt: 'Fall leaves on water' },            // Oct
-  { url: 'https://images.unsplash.com/photo-1516912481808-3406841bd33c?w=900&q=80', alt: 'Late autumn bare trees' },          // Nov
-  { url: 'https://images.unsplash.com/photo-1418985991508-e47386d96a71?w=900&q=80', alt: 'Winter snow scene' },               // Dec
+  { url: 'https://images.unsplash.com/photo-1516912481808-3406841bd33c?w=1200&q=85', alt: 'Snowy winter landscape' },
+  { url: 'https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=1200&q=85', alt: 'Misty forest in early spring' },
+  { url: 'https://images.unsplash.com/photo-1490750967868-88df5691cc1b?w=1200&q=85', alt: 'Cherry blossoms in bloom' },
+  { url: 'https://images.unsplash.com/photo-1462275646964-a0e3386b89fa?w=1200&q=85', alt: 'Spring meadow flowers' },
+  { url: 'https://images.unsplash.com/photo-1490750967868-88df5691cc1b?w=1200&q=85', alt: 'Bright spring hillside' },
+  { url: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=1200&q=85', alt: 'Sunlit summer mountain' },
+  { url: 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1200&q=85', alt: 'Warm beach sunset' },
+  { url: 'https://images.unsplash.com/photo-1444464666168-49d633b86797?w=1200&q=85', alt: 'Golden summer valley' },
+  { url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200&q=85', alt: 'Autumn forest foliage' },
+  { url: 'https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=1200&q=85', alt: 'Fall leaves on water' },
+  { url: 'https://images.unsplash.com/photo-1516912481808-3406841bd33c?w=1200&q=85', alt: 'Late autumn bare trees' },
+  { url: 'https://images.unsplash.com/photo-1418985991508-e47386d96a71?w=1200&q=85', alt: 'Winter snow scene' },
 ]
 
-/**
- * Hero image panel shown at the top (mobile) or left side (desktop).
- * Displays a month-appropriate photo with a wave cut at the bottom/right.
- */
 export default function HeroImage({ currentMonth, currentYear, monthName }) {
   const image = MONTH_IMAGES[currentMonth]
 
   return (
-    <div className="relative overflow-hidden bg-gray-900 h-56 md:h-full md:min-h-[480px]">
-      {/* Background photo */}
-      <img
-        src={image.url}
-        alt={image.alt}
-        className="absolute inset-0 w-full h-full object-cover opacity-90"
-        loading="lazy"
-      />
-
-      {/* Dark gradient overlay for text legibility */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-
-      {/* Month label bottom-left
-          min-w-0 + pr-10 prevents text from bleeding under the wave edge.
-          Month scales from 2xl on mobile up to 3xl on desktop — long names
-          like "September" stay contained without wrapping awkwardly. */}
-      <div className="absolute bottom-0 left-0 p-5 md:p-6 z-10 min-w-0 pr-10 md:pr-14">
-        <p className="text-white/60 text-xs font-medium uppercase tracking-[0.2em]">
-          {currentYear}
-        </p>
-        <h1 className="text-white text-2xl md:text-3xl font-semibold tracking-tight leading-tight mt-0.5 truncate">
-          {monthName}
-        </h1>
+    <div className="relative overflow-visible" style={{ height: '220px' }}>
+      {/* Photo */}
+      <div className="absolute inset-0 overflow-hidden" style={{ borderRadius: '2rem 2rem 0 0' }}>
+        <img
+          src={image.url}
+          alt={image.alt}
+          className="w-full h-full object-cover"
+          style={{ objectPosition: 'center 40%' }}
+          loading="lazy"
+        />
+        {/* Deep gradient — heavy at bottom for text readability */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.12) 40%, rgba(0,0,0,0.55) 100%)',
+          }}
+        />
+        {/* Subtle warm tint overlay */}
+        <div
+          className="absolute inset-0"
+          style={{ background: 'rgba(20, 50, 90, 0.12)', mixBlendMode: 'multiply' }}
+        />
       </div>
 
-      {/* Wave clip at right edge on desktop, bottom on mobile */}
-      <WaveEdge />
-    </div>
-  )
-}
+      {/* Month accent badge — bleeds out of hero into the body below */}
+      <div
+        className="absolute left-7 flex flex-col"
+        style={{
+          bottom: '-28px',
+          zIndex: 20,
+        }}
+      >
+        <div
+          className="flex items-end gap-3"
+          style={{
+            background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+            borderRadius: '14px',
+            padding: '14px 22px 16px 22px',
+            boxShadow: '0 8px 32px rgba(37, 99, 235, 0.38), 0 2px 8px rgba(0,0,0,0.12)',
+          }}
+        >
+          <span
+            className="text-white font-bold leading-none tracking-tight"
+            style={{ fontSize: '2.6rem', letterSpacing: '-0.03em', lineHeight: 1 }}
+          >
+            {monthName}
+          </span>
+          <span
+            className="text-blue-200 font-medium pb-1"
+            style={{ fontSize: '0.8rem', letterSpacing: '0.12em', opacity: 0.85 }}
+          >
+            {currentYear}
+          </span>
+        </div>
+      </div>
 
-/** SVG wave that creates a soft diagonal cut between image and calendar */
-function WaveEdge() {
-  return (
-    <>
-      {/* Mobile: bottom wave */}
-      <div className="md:hidden absolute bottom-0 left-0 right-0 h-10 overflow-hidden">
+      {/* Curved SVG divider at the very bottom */}
+      <div className="absolute bottom-0 left-0 right-0 overflow-hidden" style={{ height: '32px', zIndex: 10 }}>
         <svg
-          viewBox="0 0 400 40"
+          viewBox="0 0 800 32"
           preserveAspectRatio="none"
           className="absolute bottom-0 w-full h-full"
         >
-          <path d="M0,40 L0,20 Q100,0 200,18 Q300,36 400,14 L400,40 Z" fill="white" />
+          <path
+            d="M0,32 L0,18 C100,6 200,26 400,16 C600,6 700,24 800,14 L800,32 Z"
+            fill="#faf9f7"
+          />
         </svg>
       </div>
-
-      {/* Desktop: right-side wave */}
-      <div className="hidden md:block absolute top-0 right-0 bottom-0 w-12 overflow-hidden">
-        <svg
-          viewBox="0 0 48 600"
-          preserveAspectRatio="none"
-          className="absolute top-0 right-0 h-full w-full"
-        >
-          <path d="M48,0 L20,0 Q0,150 28,300 Q48,440 16,600 L48,600 Z" fill="white" />
-        </svg>
-      </div>
-    </>
+    </div>
   )
 }

@@ -3,12 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import DayCell from './DayCell'
 import { DAYS_OF_WEEK } from '../utils/dateUtils'
 
-/**
- * Renders the full calendar month grid including:
- *  - Month/year header with prev/next/today navigation
- *  - Day-of-week header row
- *  - Full grid of DayCell components
- */
 export default function CalendarGrid({
   currentYear,
   currentMonth,
@@ -24,71 +18,70 @@ export default function CalendarGrid({
   const monthKey = `${currentYear}-${currentMonth}`
 
   return (
-    <div className="flex flex-col gap-4">
-      {/* Header: Month + Navigation
-          min-w-0 on the row enables the text child to truncate correctly.
-          flex-shrink-0 on controls keeps them from ever being squeezed. */}
-      <div className="flex items-center justify-between gap-2 min-w-0">
-        {/* Text side — takes remaining space, clips on overflow */}
-        <div className="min-w-0 flex-1">
-          <h2 className="text-lg md:text-xl font-semibold text-gray-900 tracking-tight leading-tight truncate">
-            {monthName}
-          </h2>
-          <span className="text-xs text-gray-400 font-medium mt-0.5 block">
-            {currentYear}
-          </span>
-        </div>
+    <div className="flex flex-col gap-5" style={{ paddingTop: '36px' }}>
 
-        {/* Controls — fixed size, never shrink */}
-        <div className="flex items-center gap-1 flex-shrink-0">
-          <button
-            onClick={goToToday}
-            className="px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-full transition-colors duration-150 whitespace-nowrap"
-          >
-            Today
-          </button>
-          <button
-            onClick={goToPrevMonth}
-            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-800 transition-colors duration-150"
-            aria-label="Previous month"
-          >
-            <ChevronLeftIcon />
-          </button>
-          <button
-            onClick={goToNextMonth}
-            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-800 transition-colors duration-150"
-            aria-label="Next month"
-          >
-            <ChevronRightIcon />
-          </button>
-        </div>
+      {/* ── Nav row ── */}
+      <div className="flex items-center justify-end gap-1">
+        <button
+          onClick={goToToday}
+          className="px-3 py-1 text-xs font-semibold rounded-full transition-all duration-150"
+          style={{
+            color: '#2563eb',
+            background: 'rgba(37,99,235,0.08)',
+            letterSpacing: '0.02em',
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = 'rgba(37,99,235,0.15)'}
+          onMouseLeave={e => e.currentTarget.style.background = 'rgba(37,99,235,0.08)'}
+        >
+          Today
+        </button>
+        <button
+          onClick={goToPrevMonth}
+          className="w-8 h-8 flex items-center justify-center rounded-full transition-all duration-150"
+          style={{ color: '#9a9390' }}
+          aria-label="Previous month"
+          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,0,0,0.06)'; e.currentTarget.style.color = '#3d3733' }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#9a9390' }}
+        >
+          <ChevronLeftIcon />
+        </button>
+        <button
+          onClick={goToNextMonth}
+          className="w-8 h-8 flex items-center justify-center rounded-full transition-all duration-150"
+          style={{ color: '#9a9390' }}
+          aria-label="Next month"
+          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,0,0,0.06)'; e.currentTarget.style.color = '#3d3733' }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#9a9390' }}
+        >
+          <ChevronRightIcon />
+        </button>
       </div>
 
-      {/* Day of week headers */}
-      <div className="grid grid-cols-7 mb-1">
+      {/* ── Day headers ── */}
+      <div className="grid grid-cols-7">
         {DAYS_OF_WEEK.map((day) => (
           <div
             key={day}
-            className="flex items-center justify-center h-8 text-xs font-semibold text-gray-400 uppercase tracking-wider"
+            className="flex items-center justify-center h-7 font-semibold uppercase tracking-widest"
+            style={{ color: '#c4bdb7', fontSize: '0.62rem' }}
           >
             {day}
           </div>
         ))}
       </div>
 
-      {/* Day cells grid — animated on month change */}
+      {/* ── Animated day grid ── */}
       <AnimatePresence mode="wait">
         <motion.div
           key={monthKey}
-          initial={{ opacity: 0, x: 40 }}
+          initial={{ opacity: 0, x: 32 }}
           animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -40 }}
-          transition={{ duration: 0.25 }}
+          exit={{ opacity: 0, x: -32 }}
+          transition={{ duration: 0.22, ease: [0.25, 0.1, 0.25, 1] }}
           className="grid grid-cols-7 gap-y-0.5"
         >
           {calendarGrid.map(({ date, isCurrentMonth }) => {
             const state = getDayState(date)
-
             return (
               <DayCell
                 key={date.toISOString()}
@@ -116,16 +109,16 @@ export default function CalendarGrid({
 
 function ChevronLeftIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-      <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+      <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }
 
 function ChevronRightIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-      <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+      <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }

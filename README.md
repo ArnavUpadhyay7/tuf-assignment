@@ -84,6 +84,11 @@ These features are planned to further enhance UX and demonstrate product thinkin
   * Smooth hover transitions
   * Animated feedback for selections and saving
 
+  * ⚡ **Footer**
+
+  * Simple footer
+  * Made with love by Arnav (type some text)
+
 ---
 
 ## 🛠 Tech Stack
