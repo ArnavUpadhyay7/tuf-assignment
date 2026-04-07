@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #f0f2f5;
+    min-height: 100vh;
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  .day-cell-base {
+    @apply relative flex items-center justify-center h-9 w-9 rounded-full text-sm font-medium transition-all duration-150 cursor-pointer select-none;
+  }
+
+  .day-in-range {
+    @apply bg-blue-50 text-blue-700 rounded-none;
+  }
+
+  .day-range-start {
+    @apply bg-blue-500 text-white rounded-full;
+  }
+
+  .day-range-end {
+    @apply bg-blue-500 text-white rounded-full;
+  }
+
+  .day-today {
+    @apply font-semibold;
+  }
+
+  .notes-textarea {
+    @apply w-full resize-none bg-transparent text-sm text-gray-700 placeholder-gray-400 
+           leading-relaxed outline-none font-sans;
+    font-family: inherit;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
