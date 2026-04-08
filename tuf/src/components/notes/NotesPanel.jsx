@@ -42,8 +42,6 @@ function ClearButton({ onClick }) {
   )
 }
 
-// ── NotesPanel ────────────────────────────────────────────────────────────────
-
 export default function NotesPanel({
   currentYear,
   currentMonth,

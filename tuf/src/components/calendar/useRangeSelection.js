@@ -47,10 +47,7 @@ export function useRangeSelection() {
     setHoverDate(null)
   }, [])
 
-  /**
-   * Derives all display states for a single calendar day.
-   * Preview range is only active when startDate is set and endDate is not.
-   */
+
   function getDayState(date) {
     const isStart = !!(startDate && isSameDay(date, startDate))
     const isEnd = !!(endDate && isSameDay(date, endDate))

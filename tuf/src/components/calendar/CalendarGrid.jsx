@@ -1,7 +1,61 @@
-import React, { useState, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
 import DayCell from './DayCell'
 import { DAYS_OF_WEEK } from '../utils/dateUtils'
+
+const GRID_HEIGHT = 216
+
+const HOLIDAYS = {
+  '01-01': "New Year's Day",
+  '01-13': 'Lohri',
+  '01-14': 'Makar Sankranti / Pongal',
+  '01-23': 'Netaji Subhas Chandra Bose Jayanti',
+  '01-26': 'Republic Day',
+
+  '02-05': 'Basant Panchami',
+  '02-14': 'Valentine’s Day (lol)',
+  '02-18': 'Maha Shivaratri',
+
+  '03-08': 'Holi',
+  '03-22': 'Ugadi / Gudi Padwa',
+  '03-30': 'Ram Navami',
+
+  '04-04': 'Mahavir Jayanti',
+  '04-03': 'Good Friday',
+  '04-14': 'Ambedkar Jayanti / Baisakhi',
+  '04-21': 'Eid al-Fitr',
+
+  '05-01': 'Labour Day / Maharashtra Day',
+  '05-05': 'Buddha Purnima',
+
+  '06-19': 'Eid al-Adha (Bakrid)',
+
+  '07-29': 'Muharram',
+
+  '08-15': 'Independence Day',
+  '08-19': 'Raksha Bandhan',
+  '08-26': 'Janmashtami',
+
+  '09-07': 'Ganesh Chaturthi',
+  '09-16': 'Onam',
+
+  '10-02': 'Gandhi Jayanti',
+  '10-12': 'Durga Puja / Maha Ashtami',
+  '10-24': 'Dussehra',
+
+  '11-01': 'Karva Chauth',
+  '11-12': 'Diwali',
+  '11-15': 'Bhai Dooj',
+  '11-19': 'Chhath Puja',
+  '11-27': 'Guru Nanak Jayanti',
+
+  '12-25': 'Christmas Day',
+  '12-31': 'New Year’s Eve'
+}
+
+function getHolidayName(date) {
+  const mm = String(date.getMonth() + 1).padStart(2, '0')
+  const dd = String(date.getDate()).padStart(2, '0')
+  return HOLIDAYS[`${mm}-${dd}`] ?? null
+}
 
 // ── Sub-components ─────────────────────────────────────────────────────────────
 
@@ -20,7 +74,7 @@ function NavButton({ onClick, children, pill = false, 'aria-label': ariaLabel })
     <button
       onClick={onClick}
       aria-label={ariaLabel}
-      className="w-8 h-8 flex items-center justify-center rounded-full text-stone-400 hover:bg-black/6 hover:text-stone-700 transition-all duration-150"
+      className="w-8 h-8 flex items-center justify-center rounded-full text-stone-400 hover:bg-black/[0.06] hover:text-stone-700 transition-all duration-150"
     >
       {children}
     </button>
@@ -43,12 +97,9 @@ function ChevronRight() {
   )
 }
 
-// ── CalendarGrid ──────────────────────────────────────────────────────────────
-
 export default function CalendarGrid({
   currentYear,
   currentMonth,
-  monthName,
   calendarGrid,
   goToPrevMonth,
   goToNextMonth,
@@ -57,30 +108,17 @@ export default function CalendarGrid({
   handleDayClick,
   setHoverDate,
 }) {
-  const [direction, setDirection] = useState(0)
-  const monthKey = `${currentYear}-${currentMonth}`
-
-  const handlePrev = useCallback(() => {
-    setDirection(-1)
-    goToPrevMonth()
-  }, [goToPrevMonth])
-
-  const handleNext = useCallback(() => {
-    setDirection(1)
-    goToNextMonth()
-  }, [goToNextMonth])
-
   return (
     <div className="flex flex-col gap-5 pt-9">
 
       {/* Navigation row */}
       <div className="flex items-center justify-end gap-1">
         <NavButton onClick={goToToday} pill>Today</NavButton>
-        <NavButton onClick={handlePrev} aria-label="Previous month"><ChevronLeft /></NavButton>
-        <NavButton onClick={handleNext} aria-label="Next month"><ChevronRight /></NavButton>
+        <NavButton onClick={goToPrevMonth} aria-label="Previous month"><ChevronLeft /></NavButton>
+        <NavButton onClick={goToNextMonth} aria-label="Next month"><ChevronRight /></NavButton>
       </div>
 
-      {/* Day-of-week headers — static, never animated */}
+      {/* Day-of-week headers */}
       <div className="grid grid-cols-7">
         {DAYS_OF_WEEK.map((day) => (
           <div
@@ -92,44 +130,33 @@ export default function CalendarGrid({
         ))}
       </div>
 
-      {/* Animated day grid
-          popLayout: exit + enter overlap so the new grid starts sliding in
-          immediately — no perceived gap before dates appear.
-          overflow-hidden on the wrapper clips cells sliding outside bounds. */}
-      <div className="overflow-hidden">
-        <AnimatePresence mode="popLayout" custom={direction}>
-          <motion.div
-            key={monthKey}
-            custom={direction}
-            initial={{ opacity: 0, x: direction * 80 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: direction * -80 }}
-            transition={{ duration: 0.28, ease: [0.32, 0, 0.18, 1] }}
-            className="grid grid-cols-7"
-          >
-            {calendarGrid.map(({ date, isCurrentMonth }) => {
-              const state = getDayState(date)
-              return (
-                <DayCell
-                  key={date.toISOString()}
-                  date={date}
-                  isCurrentMonth={isCurrentMonth}
-                  isStart={state.isStart}
-                  isEnd={state.isEnd}
-                  inRange={state.inRange}
-                  isRangeStart={state.isRangeStart}
-                  isRangeEnd={state.isRangeEnd}
-                  isInPreviewRange={state.isInPreviewRange}
-                  isPreviewStart={state.isPreviewStart}
-                  isPreviewEnd={state.isPreviewEnd}
-                  onClick={handleDayClick}
-                  onMouseEnter={(d) => setHoverDate(d)}
-                  onMouseLeave={() => setHoverDate(null)}
-                />
-              )
-            })}
-          </motion.div>
-        </AnimatePresence>
+      {/* Day grid — fixed height prevents layout shift across month sizes */}
+      <div
+        className="grid grid-cols-7 content-start"
+        style={{ height: GRID_HEIGHT }}
+      >
+        {calendarGrid.map(({ date, isCurrentMonth }) => {
+          const state = getDayState(date)
+          return (
+            <DayCell
+              key={date.toISOString()}
+              date={date}
+              isCurrentMonth={isCurrentMonth}
+              isStart={state.isStart}
+              isEnd={state.isEnd}
+              inRange={state.inRange}
+              isRangeStart={state.isRangeStart}
+              isRangeEnd={state.isRangeEnd}
+              isInPreviewRange={state.isInPreviewRange}
+              isPreviewStart={state.isPreviewStart}
+              isPreviewEnd={state.isPreviewEnd}
+              holidayName={getHolidayName(date)}
+              onClick={handleDayClick}
+              onMouseEnter={(d) => setHoverDate(d)}
+              onMouseLeave={() => setHoverDate(null)}
+            />
+          )
+        })}
       </div>
 
     </div>

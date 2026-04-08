@@ -1,45 +1,42 @@
-import { useState, useMemo } from 'react'
-import { buildCalendarGrid, MONTH_NAMES } from '../utils/dateUtils'
+import { useState, useCallback, useMemo } from 'react'
+import { buildCalendarGrid, MONTHS } from '../utils/dateUtils'
 
 export function useCalendar() {
-  const today = new Date()
+  const now = new Date()
 
-  const [currentYear, setCurrentYear] = useState(today.getFullYear())
-  const [currentMonth, setCurrentMonth] = useState(today.getMonth())
+  const [year, setYear]         = useState(now.getFullYear())
+  const [month, setMonth]       = useState(now.getMonth())
+  const [direction, setDirection] = useState(0)
 
-  const calendarGrid = useMemo(
-    () => buildCalendarGrid(currentYear, currentMonth),
-    [currentYear, currentMonth]
-  )
+  const calendarGrid = useMemo(() => buildCalendarGrid(year, month), [year, month])
 
-  function goToPrevMonth() {
-    if (currentMonth === 0) {
-      setCurrentMonth(11)
-      setCurrentYear((y) => y - 1)
-    } else {
-      setCurrentMonth((m) => m - 1)
-    }
-  }
+  const goToPrevMonth = useCallback(() => {
+    setDirection(-1)
+    setYear((y) => (month === 0 ? y - 1 : y))
+    setMonth((m) => (m === 0 ? 11 : m - 1))
+  }, [month])
 
-  function goToNextMonth() {
-    if (currentMonth === 11) {
-      setCurrentMonth(0)
-      setCurrentYear((y) => y + 1)
-    } else {
-      setCurrentMonth((m) => m + 1)
-    }
-  }
+  const goToNextMonth = useCallback(() => {
+    setDirection(1)
+    setYear((y) => (month === 11 ? y + 1 : y))
+    setMonth((m) => (m === 11 ? 0 : m + 1))
+  }, [month])
 
-  function goToToday() {
-    setCurrentYear(today.getFullYear())
-    setCurrentMonth(today.getMonth())
-  }
+  const goToToday = useCallback(() => {
+    const todayYear  = now.getFullYear()
+    const todayMonth = now.getMonth()
+    const isAhead = year > todayYear || (year === todayYear && month > todayMonth)
+    setDirection(isAhead ? -1 : 1)
+    setYear(todayYear)
+    setMonth(todayMonth)
+  }, [year, month])
 
   return {
-    currentYear,
-    currentMonth,
-    monthName: MONTH_NAMES[currentMonth],
+    currentYear:  year,
+    currentMonth: month,
+    monthName:    MONTHS[month],
     calendarGrid,
+    direction,
     goToPrevMonth,
     goToNextMonth,
     goToToday,
