@@ -62,27 +62,10 @@ A polished, interactive calendar component built with **React (Vite) + Tailwind 
 
 These features are planned to further enhance UX and demonstrate product thinking:
 
-* 🎬 **Flip Animation (Framer Motion)**
-
-  * Smooth page-flip or slide transition when changing months
-
 * 🎨 **Dynamic Theme Based on Image**
 
   * Extract dominant color from hero image
   * Apply subtle theme accents to calendar
-
-* 📅 **Today Indicator**
-
-  * Highlight current date with subtle UI marker
-
-* 🏷️ **Holiday / Event Markers**
-
-  * Add visual indicators for important dates
-
-* ⚡ **Micro-interactions**
-
-  * Smooth hover transitions
-  * Animated feedback for selections and saving
 
   * ⚡ **Footer**
 
