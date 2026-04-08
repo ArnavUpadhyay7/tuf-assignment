@@ -1,9 +1,7 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { notesStorageKey, formatRange } from '../utils/dateUtils'
 
 const MAX_CHARS = 500
-
-// ── Sub-components ─────────────────────────────────────────────────────────────
 
 function CalendarRangeIcon() {
   return (
@@ -88,12 +86,12 @@ export default function NotesPanel({
   const isNearLimit = charsLeft <= 50
 
   return (
-    <div className="flex flex-col h-full gap-[18px]">
+    <div className="flex flex-col h-full gap-4.5">
 
       {/* Header */}
       <div className="flex items-start justify-between gap-2 min-w-0">
         <div className="min-w-0 flex-1">
-          <h3 className="text-[10px] font-semibold uppercase tracking-[0.14em] text-stone-400 leading-none">
+          <h3 className="text-[10px] font-semibold uppercase tracking-[0.14em] text-stone-500 leading-none">
             Notes
           </h3>
 
@@ -103,7 +101,7 @@ export default function NotesPanel({
               <span className="truncate">{rangeLabel}</span>
             </p>
           ) : (
-            <p className="mt-2 text-[12px] text-stone-300">Monthly note</p>
+            <p className="mt-2 text-[12px] text-stone-400">Monthly note</p>
           )}
         </div>
 
@@ -111,7 +109,7 @@ export default function NotesPanel({
       </div>
 
       {/* Lined writing area */}
-      <div className="relative flex-1 min-h-[180px]">
+      <div className="relative flex-1 min-h-45">
         {/* Lined paper background */}
         <div
           className="absolute inset-0 pointer-events-none"
@@ -137,7 +135,7 @@ export default function NotesPanel({
       </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-between pt-3 border-t border-black/[0.06]">
+      <div className="flex items-center justify-between pt-3 border-t border-black/6">
         <SaveStatus status={saveStatus} />
         <span
           className={`text-[11px] tabular-nums transition-colors duration-200 ${

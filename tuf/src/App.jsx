@@ -18,8 +18,8 @@ const cardVariants = {
     translateZ: 0,
     transformOrigin: 'top center',
     transition: {
-      rotateX: { duration: 0.62, ease: [0.22, 1, 0.36, 1] },
-      opacity:  { duration: 0.18, ease: 'easeIn' },
+      rotateX:    { duration: 0.62, ease: [0.22, 1, 0.36, 1] },
+      opacity:    { duration: 0.18, ease: 'easeIn' },
       translateZ: { duration: 0.62, ease: [0.22, 1, 0.36, 1] },
     },
   },
@@ -29,8 +29,8 @@ const cardVariants = {
     translateZ: -30,
     transformOrigin: 'top center',
     transition: {
-      rotateX: { duration: 0.52, ease: [0.4, 0, 0.8, 0] },
-      opacity:  { duration: 0.25, ease: 'easeOut', delay: 0.2 },
+      rotateX:    { duration: 0.52, ease: [0.4, 0, 0.8, 0] },
+      opacity:    { duration: 0.25, ease: 'easeOut', delay: 0.2 },
       translateZ: { duration: 0.52, ease: [0.4, 0, 0.8, 0] },
     },
   }),
@@ -41,50 +41,54 @@ function SelectionHint({ hasSelection, hasRange, startDate, endDate }) {
 
   if (!hasSelection) {
     return (
-      <p className="mt-5 text-xs text-center text-stone-300">
+      // Slightly warmer/darker than before — stone-400 reads clearly over white
+      <p className="mt-5 text-xs text-center text-stone-400">
         Click a day to start selecting a range
       </p>
     )
   }
   if (!hasRange) {
     return (
-      <p className="mt-5 text-xs text-center text-blue-300 animate-pulse">
+      // Blue-500 ensures this pulsing prompt is unmissable
+      <p className="mt-5 text-xs text-center text-blue-500 animate-pulse">
         Click another day to complete the range
       </p>
     )
   }
   return (
-    <p className="mt-5 text-xs text-center text-stone-400">
-      {fmt(startDate)} → {fmt(endDate)}
-      <span className="text-stone-300"> · Click any day to reset</span>
+    <p className="mt-5 text-xs text-center text-stone-500">
+      {fmt(startDate)}
+      <span className="mx-1.5 text-stone-400">→</span>
+      {fmt(endDate)}
+      <span className="text-stone-400"> · Click any day to reset</span>
     </p>
   )
 }
 
 export default function App() {
   const calendar = useCalendar()
-  const range = useRangeSelection()
+  const range    = useRangeSelection()
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 md:p-8 bg-gradient-to-br from-stone-200 to-stone-300">
+    <div className="min-h-screen flex items-center justify-center p-4 md:p-8 bg-linear-to-br from-stone-200 to-stone-300">
 
       <div
         className="w-full max-w-3xl relative"
         style={{
-          perspective: '1600px',
+          perspective:       '1600px',
           perspectiveOrigin: '50% 22%',
         }}
       >
+        {/* Stacked-pages shadow layer */}
         <div
           className="absolute inset-0 rounded-[28px] bg-[#e8e3de] ring-1 ring-black/5"
           style={{
-            transform: 'scaleX(0.968) translateY(5px)',
-            boxShadow: '0 28px 70px rgba(0,0,0,0.26), 0 8px 20px rgba(0,0,0,0.14)',
-            zIndex: 0,
+            transform:  'scaleX(0.968) translateY(5px)',
+            boxShadow:  '0 28px 70px rgba(0,0,0,0.26), 0 8px 20px rgba(0,0,0,0.14)',
+            zIndex:      0,
           }}
           aria-hidden
         >
-          {/* Subtle page-edge lines to reinforce the "stack of pages" feel */}
           <div
             className="absolute left-[7%] right-[7%] top-0 h-px opacity-40"
             style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.6) 30%, rgba(255,255,255,0.6) 70%, transparent)' }}
@@ -101,14 +105,13 @@ export default function App() {
             exit="exit"
             style={{
               transformStyle: 'preserve-3d',
-              willChange: 'transform, opacity',
-              position: 'relative',
-              zIndex: 10,
+              willChange:     'transform, opacity',
+              position:       'relative',
+              zIndex:          10,
             }}
             className="w-full rounded-[28px] overflow-hidden bg-[#faf9f7]"
-            whileHover={{}}  
           >
-            {/* Inner shadow/border ring */}
+            {/* Inner shadow ring */}
             <div
               className="absolute inset-0 rounded-[28px] pointer-events-none z-50"
               style={{
@@ -117,18 +120,16 @@ export default function App() {
               aria-hidden
             />
 
-            {/* Hero image + spiral binding + month badge */}
             <HeroImage
               currentMonth={calendar.currentMonth}
               currentYear={calendar.currentYear}
               monthName={calendar.monthName}
             />
 
-            {/* Body: Notes | Calendar */}
             <div className="flex flex-col md:flex-row">
 
-              {/* Notes — left column */}
-              <div className="md:w-56 lg:w-64 shrink-0 px-7 pb-7 pt-12 border-b md:border-b-0 md:border-r border-black/[0.06]">
+              {/* Notes column */}
+              <div className="md:w-56 lg:w-64 shrink-0 px-7 pb-7 pt-12 border-b md:border-b-0 md:border-r border-black/6">
                 <NotesPanel
                   currentYear={calendar.currentYear}
                   currentMonth={calendar.currentMonth}
@@ -139,7 +140,7 @@ export default function App() {
                 />
               </div>
 
-              {/* Calendar — right column */}
+              {/* Calendar column */}
               <div className="flex-1 flex flex-col px-6 md:px-7 pb-7">
                 <CalendarGrid
                   currentYear={calendar.currentYear}
