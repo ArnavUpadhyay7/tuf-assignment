@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import DayCell from './DayCell'
 import { DAYS_OF_WEEK } from '../utils/dateUtils'
@@ -57,7 +57,18 @@ export default function CalendarGrid({
   handleDayClick,
   setHoverDate,
 }) {
+  const [direction, setDirection] = useState(0)
   const monthKey = `${currentYear}-${currentMonth}`
+
+  const handlePrev = useCallback(() => {
+    setDirection(-1)
+    goToPrevMonth()
+  }, [goToPrevMonth])
+
+  const handleNext = useCallback(() => {
+    setDirection(1)
+    goToNextMonth()
+  }, [goToNextMonth])
 
   return (
     <div className="flex flex-col gap-5 pt-9">
@@ -65,11 +76,11 @@ export default function CalendarGrid({
       {/* Navigation row */}
       <div className="flex items-center justify-end gap-1">
         <NavButton onClick={goToToday} pill>Today</NavButton>
-        <NavButton onClick={goToPrevMonth} aria-label="Previous month"><ChevronLeft /></NavButton>
-        <NavButton onClick={goToNextMonth} aria-label="Next month"><ChevronRight /></NavButton>
+        <NavButton onClick={handlePrev} aria-label="Previous month"><ChevronLeft /></NavButton>
+        <NavButton onClick={handleNext} aria-label="Next month"><ChevronRight /></NavButton>
       </div>
 
-      {/* Day-of-week headers */}
+      {/* Day-of-week headers — static, never animated */}
       <div className="grid grid-cols-7">
         {DAYS_OF_WEEK.map((day) => (
           <div
@@ -81,39 +92,46 @@ export default function CalendarGrid({
         ))}
       </div>
 
-      {/* Animated day grid */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={monthKey}
-          initial={{ opacity: 0, x: 24 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -24 }}
-          transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
-          className="grid grid-cols-7"
-        >
-          {calendarGrid.map(({ date, isCurrentMonth }) => {
-            const state = getDayState(date)
-            return (
-              <DayCell
-                key={date.toISOString()}
-                date={date}
-                isCurrentMonth={isCurrentMonth}
-                isStart={state.isStart}
-                isEnd={state.isEnd}
-                inRange={state.inRange}
-                isRangeStart={state.isRangeStart}
-                isRangeEnd={state.isRangeEnd}
-                isInPreviewRange={state.isInPreviewRange}
-                isPreviewStart={state.isPreviewStart}
-                isPreviewEnd={state.isPreviewEnd}
-                onClick={handleDayClick}
-                onMouseEnter={(d) => setHoverDate(d)}
-                onMouseLeave={() => setHoverDate(null)}
-              />
-            )
-          })}
-        </motion.div>
-      </AnimatePresence>
+      {/* Animated day grid
+          popLayout: exit + enter overlap so the new grid starts sliding in
+          immediately — no perceived gap before dates appear.
+          overflow-hidden on the wrapper clips cells sliding outside bounds. */}
+      <div className="overflow-hidden">
+        <AnimatePresence mode="popLayout" custom={direction}>
+          <motion.div
+            key={monthKey}
+            custom={direction}
+            initial={{ opacity: 0, x: direction * 80 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: direction * -80 }}
+            transition={{ duration: 0.28, ease: [0.32, 0, 0.18, 1] }}
+            className="grid grid-cols-7"
+          >
+            {calendarGrid.map(({ date, isCurrentMonth }) => {
+              const state = getDayState(date)
+              return (
+                <DayCell
+                  key={date.toISOString()}
+                  date={date}
+                  isCurrentMonth={isCurrentMonth}
+                  isStart={state.isStart}
+                  isEnd={state.isEnd}
+                  inRange={state.inRange}
+                  isRangeStart={state.isRangeStart}
+                  isRangeEnd={state.isRangeEnd}
+                  isInPreviewRange={state.isInPreviewRange}
+                  isPreviewStart={state.isPreviewStart}
+                  isPreviewEnd={state.isPreviewEnd}
+                  onClick={handleDayClick}
+                  onMouseEnter={(d) => setHoverDate(d)}
+                  onMouseLeave={() => setHoverDate(null)}
+                />
+              )
+            })}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
     </div>
   )
 }

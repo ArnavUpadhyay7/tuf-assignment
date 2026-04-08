@@ -1,4 +1,5 @@
 import React from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 const MONTH_IMAGES = [
   { url: 'https://images.unsplash.com/photo-1516912481808-3406841bd33c?w=1200&q=85', alt: 'Snowy winter landscape' },
@@ -56,18 +57,29 @@ export default function HeroImage({ currentMonth, currentYear, monthName }) {
 
   return (
     <div className="relative h-[210px] shrink-0">
-      {/* Photo container */}
+      {/* Photo container — clips the crossfading images */}
       <div className="absolute inset-0 overflow-hidden rounded-t-[28px]">
-        <img
-          src={url}
-          alt={alt}
-          className="w-full h-full object-cover object-[center_40%]"
-          loading="lazy"
-        />
-        {/* Readability gradient */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-black/10 to-black/50" />
-        {/* Subtle colour tint */}
-        <div className="absolute inset-0 bg-blue-950/10 mix-blend-multiply" />
+
+        {/* Crossfade layer: new image fades in over the previous one.
+            mode="sync" lets the old image fade out while the new one fades in
+            simultaneously — creating a smooth dissolve rather than a flash. */}
+        <AnimatePresence mode="sync">
+          <motion.img
+            key={currentMonth}
+            src={url}
+            alt={alt}
+            className="absolute inset-0 w-full h-full object-cover object-[center_40%]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6, ease: 'easeInOut' }}
+            loading="lazy"
+          />
+        </AnimatePresence>
+
+        {/* Overlays sit above the image layer, always visible */}
+        <div className="absolute inset-0 bg-linear-to-b from-black/5 via-black/10 to-black/50 pointer-events-none" />
+        <div className="absolute inset-0 bg-blue-950/10 mix-blend-multiply pointer-events-none" />
       </div>
 
       <MonthBadge monthName={monthName} currentYear={currentYear} />
